@@ -19,4 +19,10 @@ export class OwnerController {
         const data = await new AuthService().register(name, email, password);
         res.status(201).json({ data });
     }
+
+    static async login(req: Request, res: Response) {
+        const { email, password } = req.body;
+        const data = await new AuthService().login(email, password);
+        res.json({ data });
+    }
 }
