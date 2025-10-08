@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+enum AppointmentStatus {
+  PENDENTE
+  CONFIRMADO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum PaymentStatus {
+  PENDENTE
+  PAGO
+  CANCELADO
+}
+
+model Owner {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String
+  stores    Store[]
+  createdAt DateTime @default(now())
+}
+
+model Store {
+  id        String @id @map("_id") @default(auto()) @db.ObjectId
+  name      String
+  logoUrl   String
+  ownerId   String @db.ObjectId
+  owner     Owner  @relation(fields: [ownerId], references: [id])
+  customers Customer[]
+  appointments Appointment[]
+  createdAt DateTime @default(now())
+}
+
+model Customer {
+  id       String @id @map("_id") @default(auto()) @db.ObjectId
+  name     String
+  email    String @unique
+  password String
+  storeId  String @db.ObjectId
+  store    Store  @relation(fields: [storeId], references: [id])
+  appointments Appointment[]
+  createdAt DateTime @default(now())
+}
+
+model Appointment {
+  id         String @id @map("_id") @default(auto()) @db.ObjectId
+  customerId String @db.ObjectId
+  storeId    String @db.ObjectId
+  service    String
+  date       DateTime
+  status     AppointmentStatus @default(PENDENTE)
+  payment    Payment?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  store      Store    @relation(fields: [storeId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Payment {
+  id            String @id @map("_id") @default(auto()) @db.ObjectId
+  appointmentId String @unique @db.ObjectId
+  amount        Float
+  method        String
+  status        PaymentStatus @default(PENDENTE)
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  createdAt     DateTime @default(now())
+}
