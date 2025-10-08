@@ -25,4 +25,11 @@ export class OwnerRepository {
         });
         return data;
     }
+
+    async getByEmail(email: string) {
+        const data = await prisma.owner.findUnique({
+            where: { email },
+        });
+        return data;
+    }
 }
