@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { onwerAuthRoute } from "./routes/owner.auth.route";
 import { errors } from "celebrate";
 import { ownerRoute } from "./routes/owner.route";
+import { errorHandler } from "./middlewares/error-handler.middleware";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use("/api/auth/owner", onwerAuthRoute);
 app.use("/api/owner", ownerRoute);
 
 app.use(errors());
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
